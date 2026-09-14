@@ -1,25 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Check,
   ChevronRight,
   FileText,
-  BadgePercent,
   PackageCheck,
   ShieldCheck,
   Truck,
 } from "lucide-react";
 
+import { ProductVariantPurchasePanel } from "./product-variant-purchase-panel";
+
 import type {
   PublicProduct,
   PublicProductCard,
 } from "../services/product.service";
-import { ProductPaymentMethods } from "./product-payment-methods";
 import { ProductFaq } from "./product-faq";
-
 import { RelatedProducts } from "./related-products";
-import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
-import { FavoriteButton } from "@/features/favorites/components/favorite-button";
 import { ProductShare } from "./product-share";
 import {
   getProductPlaceholderAlt,
@@ -31,18 +27,6 @@ interface ProductDetailProps {
   relatedProducts: PublicProductCard[];
 }
 
-function formatPrice(priceInCents: number | null) {
-  if (priceInCents === null) {
-    return null;
-  }
-
-  const formattedPrice = new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-  }).format(priceInCents / 100);
-
-  return `${formattedPrice} MXN`;
-}
 export function ProductDetail({
   product,
   relatedProducts,
@@ -51,50 +35,6 @@ export function ProductDetail({
     product.images.find((image) => image.isPrimary) ??
     product.images[0] ??
     null;
-
-  const defaultVariant =
-    product.variants.find((variant) => variant.isDefault) ??
-    product.variants[0] ??
-    null;
-
-  const priceInCents = defaultVariant?.priceInCents ?? null;
-
-  const compareAtPriceInCents = defaultVariant?.compareAtPriceInCents ?? null;
-
-  const price = formatPrice(priceInCents);
-
-  const hasDiscount =
-    priceInCents !== null &&
-    compareAtPriceInCents !== null &&
-    compareAtPriceInCents > priceInCents;
-
-  const compareAtPrice = hasDiscount
-    ? formatPrice(compareAtPriceInCents)
-    : null;
-
-  const discountPercentage = hasDiscount
-    ? Math.round(
-        ((compareAtPriceInCents - priceInCents) / compareAtPriceInCents) * 100,
-      )
-    : null;
-
-  const savings = hasDiscount
-    ? formatPrice(compareAtPriceInCents - priceInCents)
-    : null;
-
-  const canPurchase = defaultVariant?.canPurchase ?? false;
-
-  const isDirectPurchase = product.saleMode === "direct_purchase";
-
-  const isInStock =
-    defaultVariant !== null &&
-    (!defaultVariant.trackInventory || defaultVariant.stock > 0);
-
-  const isBackorder =
-    defaultVariant !== null &&
-    defaultVariant.trackInventory &&
-    defaultVariant.stock <= 0 &&
-    defaultVariant.allowBackorder;
 
   return (
     <div className="w-full bg-white">
@@ -155,13 +95,6 @@ export function ProductDetail({
                   Destacado
                 </span>
               )}
-
-              {isDirectPurchase && discountPercentage !== null && (
-                <span className="absolute right-5 top-5 inline-flex items-center gap-1 rounded-md bg-rose-600 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-white">
-                  <BadgePercent className="h-3.5 w-3.5" />
-                  {discountPercentage}% de descuento
-                </span>
-              )}
             </div>
 
             {/* Miniaturas */}
@@ -201,184 +134,18 @@ export function ProductDetail({
               {product.name}
             </h1>
 
-            {defaultVariant && (
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                {defaultVariant.model && (
-                  <span className="inline-flex rounded-md bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
-                    Modelo:{" "}
-                    <strong className="ml-1 font-semibold text-slate-800">
-                      {defaultVariant.model}
-                    </strong>
-                  </span>
-                )}
-
-                {defaultVariant.sku && (
-                  <span className="inline-flex rounded-md bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
-                    SKU:{" "}
-                    <strong className="ml-1 font-semibold text-slate-800">
-                      {defaultVariant.sku}
-                    </strong>
-                  </span>
-                )}
-              </div>
-            )}
-
             {product.shortDescription && (
               <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
                 {product.shortDescription}
               </p>
             )}
 
-            <div className="my-3 border-t border-slate-200" />
-
-            {/* Precio */}
-            {isDirectPurchase ? (
-              price ? (
-                <div className={hasDiscount ? "rounded-2xl  p-2" : ""}>
-                  {hasDiscount && discountPercentage !== null && (
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1 text-xs font-semibold text-white">
-                        <BadgePercent className="h-3.5 w-3.5" />
-                        Oferta
-                      </span>
-
-                      <span className="text-sm font-semibold text-rose-700">
-                        Ahorras {discountPercentage}%
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap items-end gap-x-4 gap-y-1">
-                    <span className="block text-3xl font-semibold tracking-tight text-slate-950">
-                      {price}
-                    </span>
-
-                    {compareAtPrice && (
-                      <span className="pb-1 text-sm text-slate-500">
-                        Antes{" "}
-                        <span className="line-through">{compareAtPrice}</span>
-                      </span>
-                    )}
-                  </div>
-
-                  {savings && (
-                    <p className="mt-2 text-sm font-semibold text-rose-700">
-                      Ahorras {savings}
-                    </p>
-                  )}
-                  <p
-                    className={`mt-3 text-sm font-semibold ${
-                      isInStock
-                        ? "text-emerald-700"
-                        : isBackorder
-                          ? "text-amber-700"
-                          : "text-red-700"
-                    }`}
-                  >
-                    {isInStock
-                      ? defaultVariant?.trackInventory
-                        ? `${defaultVariant.stock} disponibles`
-                        : "Disponible"
-                      : isBackorder
-                        ? "Disponible sobre pedido"
-                        : "Sin existencias"}
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                    Compra directa
-                  </span>
-
-                  <p className="mt-1 text-xl font-semibold text-slate-950">
-                    Precio no disponible
-                  </p>
-                </div>
-              )
-            ) : product.saleMode === "quote_only" ? (
-              <div className="rounded-xl border border-sky-100 bg-sky-50 p-5">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-700">
-                  Venta especializada
-                </span>
-
-                <p className="mt-1 text-xl font-semibold text-slate-950">
-                  Precio bajo cotización
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Solicita información y nuestro equipo comercial te ayudará con
-                  disponibilidad, precio y condiciones de entrega.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Información comercial
-                </span>
-
-                <p className="mt-1 text-xl font-semibold text-slate-950">
-                  Contáctanos para conocer más
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Nuestro equipo puede ayudarte con información, disponibilidad
-                  y condiciones comerciales.
-                </p>
-              </div>
-            )}
-
-            {defaultVariant && (
-              <div className="mt-3">
-                <span className="text-sm font-semibold text-slate-950">
-                  Presentación seleccionada
-                </span>
-
-                <div className="mt-2 rounded-xl border border-sky-600 bg-sky-50/50 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {defaultVariant.name}
-                      </p>
-
-                      {defaultVariant.model && (
-                        <p className="mt-1 text-xs text-slate-500">
-                          Modelo {defaultVariant.model}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-700 text-white">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Acciones */}
-            <div className="mt-7 flex gap-3">
-              {canPurchase && defaultVariant ? (
-                <AddToCartButton
-                  variantId={defaultVariant.id}
-                  productName={product.name}
-                />
-              ) : (
-                <Link
-                  href="/contacto"
-                  className="flex h-12 flex-1 items-center justify-center rounded-lg bg-sky-700 px-6 text-sm font-semibold text-white transition hover:bg-sky-800"
-                >
-                  Solicitar cotización
-                </Link>
-              )}
-
-              <FavoriteButton
-                productId={product.id}
-                productName={product.name}
-                variant="detail"
-              />
-            </div>
-
-            {isDirectPurchase && <ProductPaymentMethods />}
+            <ProductVariantPurchasePanel
+              productId={product.id}
+              productName={product.name}
+              saleMode={product.saleMode}
+              variants={product.variants}
+            />
 
             <ProductShare
               productName={product.name}

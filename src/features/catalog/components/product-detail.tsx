@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -17,11 +16,7 @@ import type {
 import { ProductFaq } from "./product-faq";
 import { RelatedProducts } from "./related-products";
 import { ProductShare } from "./product-share";
-import {
-  getProductPlaceholderAlt,
-  PRODUCT_PLACEHOLDER_IMAGE_URL,
-} from "../product-image.constants";
-
+import { ProductImageGallery } from "./product-image-gallery";
 interface ProductDetailProps {
   product: PublicProduct;
   relatedProducts: PublicProductCard[];
@@ -31,11 +26,6 @@ export function ProductDetail({
   product,
   relatedProducts,
 }: ProductDetailProps) {
-  const primaryImage =
-    product.images.find((image) => image.isPrimary) ??
-    product.images[0] ??
-    null;
-
   return (
     <div className="w-full bg-white">
       <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
@@ -75,49 +65,13 @@ export function ProductDetail({
         {/* Principal */}
         <section className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)] xl:gap-16">
           {/* Galería */}
-          <div>
-            <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-slate-50 p-8 lg:p-12">
-              <Image
-                src={primaryImage?.url ?? PRODUCT_PLACEHOLDER_IMAGE_URL}
-                alt={
-                  primaryImage?.altText ||
-                  getProductPlaceholderAlt(product.name)
-                }
-                width={primaryImage?.width ?? 500}
-                height={primaryImage?.height ?? 500}
-                sizes="(min-width: 1024px) 55vw, 100vw"
-                preload
-                className="h-full w-full object-contain"
-              />
+          <ProductImageGallery
+            productName={product.name}
+            featured={product.featured}
+            images={product.images}
+          />
 
-              {product.featured && (
-                <span className="absolute left-5 top-5 rounded-md bg-slate-950 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
-                  Destacado
-                </span>
-              )}
-            </div>
-
-            {/* Miniaturas */}
-            {product.images.length > 1 && (
-              <div className="mt-4 grid grid-cols-5 gap-3">
-                {product.images.map((image) => (
-                  <div
-                    key={image.url}
-                    className="aspect-square overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-2"
-                  >
-                    <Image
-                      src={image.url}
-                      alt={image.altText || product.name}
-                      width={image.width}
-                      height={image.height}
-                      sizes="120px"
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Información */}
 
           {/* Información */}
           <div className="flex flex-col">
@@ -135,7 +89,7 @@ export function ProductDetail({
             </h1>
 
             {product.shortDescription && (
-              <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+              <p className="mt-2 max-w-2xl text-base leading-7 text-slate-600">
                 {product.shortDescription}
               </p>
             )}

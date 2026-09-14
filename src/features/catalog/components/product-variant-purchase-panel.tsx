@@ -112,7 +112,7 @@ export function ProductVariantPurchasePanel({
         </div>
       )}
 
-      <div className="my-4 border-t border-slate-200" />
+      <div className="my-2 border-t border-slate-200" />
 
       {isDirectPurchase ? (
         price ? (
@@ -143,13 +143,13 @@ export function ProductVariantPurchasePanel({
             </div>
 
             {savings && (
-              <p className="mt-2 text-sm font-semibold text-rose-700">
+              <p className="mt-1 text-sm font-semibold text-rose-700">
                 Ahorras {savings}
               </p>
             )}
 
             <p
-              className={`mt-3 text-sm font-semibold ${
+              className={`mt-1 text-sm font-semibold ${
                 isInStock
                   ? "text-emerald-700"
                   : isBackorder
@@ -159,7 +159,7 @@ export function ProductVariantPurchasePanel({
             >
               {isInStock
                 ? selectedVariant?.trackInventory
-                  ? `${selectedVariant.stock} disponibles`
+                  ? "Stock disponible"
                   : "Disponible"
                 : isBackorder
                   ? "Disponible sobre pedido"
@@ -227,7 +227,7 @@ export function ProductVariantPurchasePanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => setSelectedVariantId(variant.id)}
-                  className={`w-full rounded-xl border p-4 text-left transition ${
+                  className={`w-full cursor-pointer rounded-xl border p-4 text-left transition ${
                     isSelected
                       ? "border-sky-600 bg-sky-50/50"
                       : "border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/30"

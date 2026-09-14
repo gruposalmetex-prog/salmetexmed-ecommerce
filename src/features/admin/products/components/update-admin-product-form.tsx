@@ -2,11 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import {
-  ArrowRight,
-  LoaderCircle,
-  Save,
-} from "lucide-react";
+import { ArrowRight, LoaderCircle, Save } from "lucide-react";
 
 import {
   updateAdminProductAction,
@@ -18,15 +14,9 @@ import { AdminProductCategoryFields } from "./admin-product-category-fields";
 import { AdminProductContentFields } from "./admin-product-content-fields";
 import { AdminProductSeoFields } from "./admin-product-seo-fields";
 
-type ProductSaleMode =
-  | "direct_purchase"
-  | "quote_only"
-  | "contact_only";
+type ProductSaleMode = "direct_purchase" | "quote_only" | "contact_only";
 
-type ProductStatus =
-  | "draft"
-  | "published"
-  | "archived";
+type ProductStatus = "draft" | "published" | "archived";
 
 interface BrandOption {
   id: string;
@@ -65,40 +55,27 @@ interface UpdateAdminProductFormProps {
   categories: CategoryOption[];
 }
 
-const initialUpdateState:
-  UpdateAdminProductState = {
-    status: "idle",
-  };
+const initialUpdateState: UpdateAdminProductState = {
+  status: "idle",
+};
 
 export function UpdateAdminProductForm({
   product,
   brands,
   categories,
 }: UpdateAdminProductFormProps) {
-  const [
-    state,
-    formAction,
-    pending,
-  ] = useActionState(
+  const [state, formAction, pending] = useActionState(
     updateAdminProductAction,
     initialUpdateState,
   );
 
-  const archived =
-    product.status === "archived";
+  const archived = product.status === "archived";
 
-  const cannotUpdate =
-    pending ||
-    archived ||
-    categories.length === 0;
+  const cannotUpdate = pending || archived || categories.length === 0;
 
   return (
     <form action={formAction}>
-      <input
-        type="hidden"
-        name="productId"
-        value={product.id}
-      />
+      <input type="hidden" name="productId" value={product.id} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
@@ -109,13 +86,10 @@ export function UpdateAdminProductForm({
               className="rounded-xl border border-red-200 bg-red-50 px-4 py-3"
             >
               <p className="text-sm font-semibold text-red-800">
-                No fue posible actualizar
-                el producto
+                No fue posible actualizar el producto
               </p>
 
-              <p className="mt-1 text-sm text-red-700">
-                {state.message}
-              </p>
+              <p className="mt-1 text-sm text-red-700">{state.message}</p>
             </div>
           )}
 
@@ -126,9 +100,7 @@ export function UpdateAdminProductForm({
               </p>
 
               <p className="mt-1 text-sm leading-6 text-amber-700">
-                Debes restaurar el producto
-                antes de modificar su
-                información.
+                Debes restaurar el producto antes de modificar su información.
               </p>
             </div>
           )}
@@ -139,37 +111,27 @@ export function UpdateAdminProductForm({
             defaultValues={{
               name: product.name,
               slug: product.slug,
-              brandId:
-                product.brandId,
+              brandId: product.brandId,
 
-              saleMode:
-                product.saleMode,
+              saleMode: product.saleMode,
 
-              featured:
-                product.featured,
+              featured: product.featured,
             }}
-            slugReadOnly={
-              product.status ===
-              "published"
-            }
+            slugReadOnly={product.status === "published"}
           />
 
           <AdminProductCategoryFields
             categories={categories}
             errors={state.fieldErrors}
-            defaultCategoryIds={
-              product.categoryIds
-            }
+            defaultCategoryIds={product.categoryIds}
           />
 
           <AdminProductContentFields
             errors={state.fieldErrors}
             defaultValues={{
-              shortDescription:
-                product.shortDescription,
+              shortDescription: product.shortDescription,
 
-              description:
-                product.description,
+              description: product.description,
             }}
           />
         </div>
@@ -178,11 +140,9 @@ export function UpdateAdminProductForm({
           <AdminProductSeoFields
             errors={state.fieldErrors}
             defaultValues={{
-              seoTitle:
-                product.seoTitle,
+              seoTitle: product.seoTitle,
 
-              seoDescription:
-                product.seoDescription,
+              seoDescription: product.seoDescription,
             }}
           />
 
@@ -192,19 +152,16 @@ export function UpdateAdminProductForm({
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              {product.status ===
-              "published"
+              {product.status === "published"
                 ? "Los cambios se reflejarán en la tienda después de guardar."
                 : "Los cambios permanecerán en el borrador hasta que publiques el producto."}
             </p>
 
-            {product.status ===
-              "published" && (
+            {product.status === "published" && (
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
                 <p className="text-xs leading-5 text-amber-800">
-                  El slug está protegido para
-                  evitar romper la dirección
-                  pública del producto.
+                  El slug está protegido para evitar romper la dirección pública
+                  del producto.
                 </p>
               </div>
             )}
@@ -213,7 +170,7 @@ export function UpdateAdminProductForm({
               <button
                 type="submit"
                 disabled={cannotUpdate}
-                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="inline-flex cursor-pointer h-11 w-full items-center justify-center gap-2 rounded-xl bg-sky-700 px-4 text-sm font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 {pending ? (
                   <>

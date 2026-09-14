@@ -41,17 +41,12 @@ interface EditAdminProductPageProps {
 
   searchParams: Promise<{
     step?: string | string[];
-
     variantCreated?: string | string[];
-
+    variantUpdated?: string | string[];
     imageCreated?: string | string[];
-
     documentCreated?: string | string[];
-
     updated?: string | string[];
-
     unpublished?: string | string[];
-
   }>;
 }
 
@@ -124,6 +119,8 @@ export default async function EditAdminProductPage({
   const productUpdated = firstValue(query.updated) === "1";
 
   const variantCreated = firstValue(query.variantCreated) === "1";
+
+  const variantUpdated = firstValue(query.variantUpdated) === "1";
 
   const imageCreated = firstValue(query.imageCreated) === "1";
 
@@ -366,6 +363,7 @@ export default async function EditAdminProductPage({
             saleMode={product.saleMode}
             variants={product.variants}
             variantCreated={variantCreated}
+            variantUpdated={variantUpdated}
           />
         )}
 

@@ -3,22 +3,32 @@ import { ZodError } from "zod";
 
 import { getPublicProductSearchSuggestions } from "@/features/catalog/services/product.service";
 
+import { checkRateLimit } from "@/lib/rate-limit";
+
 export const runtime = "nodejs";
 
-export async function GET(
-  request: Request,
-) {
+export async function GET(request: Request) {
   try {
-    const { searchParams } =
-      new URL(request.url);
+    const rateLimit = await checkRateLimit("searchSuggestions", request);
 
-    const query =
-      searchParams.get("q");
-
-    const suggestions =
-      await getPublicProductSearchSuggestions(
-        query,
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error:
+            "Has realizado demasiadas búsquedas. Espera un momento e inténtalo nuevamente.",
+        },
+        {
+          status: 429,
+          headers: rateLimit.headers,
+        },
       );
+    }
+
+    const { searchParams } = new URL(request.url);
+
+    const query = searchParams.get("q");
+
+    const suggestions = await getPublicProductSearchSuggestions(query);
 
     return NextResponse.json(
       {
@@ -27,6 +37,8 @@ export async function GET(
       {
         headers: {
           "Cache-Control": "no-store",
+
+          ...rateLimit.headers,
         },
       },
     );
@@ -34,8 +46,7 @@ export async function GET(
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
-          error:
-            "La búsqueda no es válida.",
+          error: "La búsqueda no es válida.",
           issues: error.flatten(),
         },
         {
@@ -44,15 +55,11 @@ export async function GET(
       );
     }
 
-    console.error(
-      "No se pudieron consultar las sugerencias",
-      error,
-    );
+    console.error("No se pudieron consultar las sugerencias", error);
 
     return NextResponse.json(
       {
-        error:
-          "No se pudieron consultar las sugerencias.",
+        error: "No se pudieron consultar las sugerencias.",
       },
       {
         status: 500,

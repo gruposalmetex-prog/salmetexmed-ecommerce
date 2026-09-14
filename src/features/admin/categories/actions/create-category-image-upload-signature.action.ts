@@ -2,29 +2,21 @@
 
 import { randomUUID } from "node:crypto";
 
-import { requireAdmin } from "@/features/admin/require-admin";
 import {
   getCloudinaryPublicConfig,
   signCloudinaryUpload,
 } from "@/lib/cloudinary";
 
-import {
-  findAdminCategoryImageContext,
-} from "../repositories/admin-category-image.repository";
+import { findAdminCategoryImageContext } from "../repositories/admin-category-image.repository";
 
-import {
-  adminCategoryImageSchema,
-} from "../schemas/admin-category-image.schema";
+import { adminCategoryImageSchema } from "../schemas/admin-category-image.schema";
+import { checkAdminUploadRateLimit } from "../../check-admin-upload-rate-limit";
 
 interface CategoryImageUploadSignatureInput {
   categoryId: string;
 }
 
-interface SignedUploadParameters
-  extends Record<
-    string,
-    string | number
-  > {
+interface SignedUploadParameters extends Record<string, string | number> {
   asset_folder: string;
   public_id: string;
   timestamp: number;
@@ -39,8 +31,7 @@ export type CategoryImageUploadSignatureResult =
         signature: string;
         apiKey: string;
 
-        parameters:
-          SignedUploadParameters;
+        parameters: SignedUploadParameters;
       };
     }
   | {
@@ -49,88 +40,66 @@ export type CategoryImageUploadSignatureResult =
     };
 
 export async function createCategoryImageUploadSignature(
-  input:
-    CategoryImageUploadSignatureInput,
+  input: CategoryImageUploadSignatureInput,
 ): Promise<CategoryImageUploadSignatureResult> {
-  await requireAdmin();
+  const rateLimit = await checkAdminUploadRateLimit();
 
-  const parsedInput =
-    adminCategoryImageSchema.safeParse(
-      input,
-    );
+  if (!rateLimit) {
+    return {
+      success: false,
+      error:
+        "Has solicitado demasiadas cargas. Espera unos minutos e inténtalo nuevamente.",
+    };
+  }
+
+  const parsedInput = adminCategoryImageSchema.safeParse(input);
 
   if (!parsedInput.success) {
-    const firstError =
-      Object.values(
-        parsedInput.error.flatten()
-          .fieldErrors,
-      )
-        .flat()
-        .find(Boolean);
+    const firstError = Object.values(parsedInput.error.flatten().fieldErrors)
+      .flat()
+      .find(Boolean);
 
     return {
       success: false,
 
-      error:
-        firstError ??
-        "Los datos de la imagen no son válidos.",
+      error: firstError ?? "Los datos de la imagen no son válidos.",
     };
   }
 
-  const category =
-    await findAdminCategoryImageContext(
-      parsedInput.data.categoryId,
-    );
+  const category = await findAdminCategoryImageContext(
+    parsedInput.data.categoryId,
+  );
 
   if (!category) {
     return {
       success: false,
-      error:
-        "La categoría no existe.",
+      error: "La categoría no existe.",
     };
   }
 
-  const assetFolder = [
-    "salmetexmed",
-    "categories",
-    category.id,
-    "images",
-  ].join("/");
+  const assetFolder = ["salmetexmed", "categories", category.id, "images"].join(
+    "/",
+  );
 
-  const parameters:
-    SignedUploadParameters = {
-    asset_folder:
-      assetFolder,
+  const parameters: SignedUploadParameters = {
+    asset_folder: assetFolder,
 
-    public_id: [
-      assetFolder,
-      randomUUID(),
-    ].join("/"),
+    public_id: [assetFolder, randomUUID()].join("/"),
 
-    timestamp:
-      Math.floor(
-        Date.now() / 1000,
-      ),
+    timestamp: Math.floor(Date.now() / 1000),
   };
 
-  const signature =
-    signCloudinaryUpload(
-      parameters,
-    );
+  const signature = signCloudinaryUpload(parameters);
 
-  const {
-    cloudName,
-    apiKey,
-  } = getCloudinaryPublicConfig();
+  const { cloudName, apiKey } = getCloudinaryPublicConfig();
 
   return {
     success: true,
 
     upload: {
-      uploadUrl:
-        `https://api.cloudinary.com/v1_1/${encodeURIComponent(
-          cloudName,
-        )}/image/upload`,
+      uploadUrl: `https://api.cloudinary.com/v1_1/${encodeURIComponent(
+        cloudName,
+      )}/image/upload`,
 
       signature,
       apiKey,

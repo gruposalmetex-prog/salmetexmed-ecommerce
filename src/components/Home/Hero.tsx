@@ -7,7 +7,7 @@ const heroItems = [
     id: 1,
     title: "Monitores",
     eyebrow: "Monitoreo de pacientes",
-    href: "/productos?category=monitores",
+    href: "/categorias/monitores-de-paciente",
     image: "/images/hero/monitores.png",
     className: "lg:col-start-1 lg:row-start-1",
     variant: "dark",
@@ -16,7 +16,7 @@ const heroItems = [
     id: 2,
     title: "Lámparas de cirugía",
     eyebrow: "Iluminación quirúrgica",
-    href: "/productos?category=lamparas-de-cirugia",
+    href: "/categorias/lamparas-de-cirugia",
     image: "/images/hero/lamparas-cirugia.png",
     className: "lg:col-start-2 lg:row-start-1",
     variant: "dark",
@@ -25,7 +25,7 @@ const heroItems = [
     id: 3,
     title: "Ultrasonidos",
     eyebrow: "Diagnóstico por imagen",
-    href: "/productos?category=ultrasonidos",
+    href: "/categorias/ultrasonidos",
     image: "/images/hero/ultrasonidos.png",
     className: "lg:col-span-2 lg:col-start-1 lg:row-start-2",
     variant: "dark",
@@ -34,7 +34,7 @@ const heroItems = [
     id: 4,
     title: "Mesas de cirugía",
     eyebrow: "Equipamiento quirúrgico",
-    href: "/productos?category=mesas-de-cirugia",
+    href: "/categorias/mesas-de-cirugia",
     image: "/images/hero/mesas-cirugia.png",
     className: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     variant: "dark",
@@ -105,7 +105,6 @@ export function Hero() {
             </Link>
           ))}
         </div>
-
       </div>
     </section>
   );

@@ -8,84 +8,50 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import {
-  ChevronDown,
-  Grid2X2,
-  Menu,
-  Stethoscope,
-} from "lucide-react";
+import { ChevronDown, Grid2X2, Menu, Stethoscope } from "lucide-react";
 
 import type { PublicCatalogFilters } from "@/features/catalog/services/catalog-filter.service";
 
 interface CatalogNavigationProps {
   areas: PublicCatalogFilters["areas"];
-  categories:
-    PublicCatalogFilters["categories"];
+  categories: PublicCatalogFilters["categories"];
 }
 
 export function CatalogNavigation({
   areas,
   categories,
 }: CatalogNavigationProps) {
-  const [isOpen, setIsOpen] =
-    useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const containerRef =
-    useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const triggerRef =
-    useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    function handleOutsidePointer(
-      event: PointerEvent,
-    ) {
-      const target =
-        event.target as Node;
+    function handleOutsidePointer(event: PointerEvent) {
+      const target = event.target as Node;
 
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(
-          target,
-        )
-      ) {
+      if (containerRef.current && !containerRef.current.contains(target)) {
         setIsOpen(false);
       }
     }
 
-    function handleKeyDown(
-      event: KeyboardEvent,
-    ) {
-      if (
-        event.key === "Escape" &&
-        isOpen
-      ) {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && isOpen) {
         setIsOpen(false);
 
         triggerRef.current?.focus();
       }
     }
 
-    document.addEventListener(
-      "pointerdown",
-      handleOutsidePointer,
-    );
+    document.addEventListener("pointerdown", handleOutsidePointer);
 
-    document.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener(
-        "pointerdown",
-        handleOutsidePointer,
-      );
+      document.removeEventListener("pointerdown", handleOutsidePointer);
 
-      document.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
 
@@ -94,21 +60,13 @@ export function CatalogNavigation({
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="relative"
-    >
+    <div ref={containerRef} className="relative">
       <button
         ref={triggerRef}
         type="button"
         aria-expanded={isOpen}
         aria-controls="catalog-navigation-menu"
-        onClick={() =>
-          setIsOpen(
-            (currentValue) =>
-              !currentValue,
-          )
-        }
+        onClick={() => setIsOpen((currentValue) => !currentValue)}
         className="flex h-14 items-center gap-2 border-r border-slate-200 pr-6 text-sm font-semibold text-slate-800"
       >
         <Menu className="h-5 w-5 text-sky-700" />
@@ -138,23 +96,15 @@ export function CatalogNavigation({
               {categories.length === 0 ? (
                 <EmptyNavigationMessage />
               ) : (
-                categories.map(
-                  (category) => (
-                    <NavigationLink
-                      key={category.slug}
-                      href={`/productos?category=${category.slug}`}
-                      name={
-                        category.name
-                      }
-                      count={
-                        category.count
-                      }
-                      onNavigate={
-                        closeMenu
-                      }
-                    />
-                  ),
-                )
+                categories.map((category) => (
+                  <NavigationLink
+                    key={category.slug}
+                    href={`/categorias/${category.slug}`}
+                    name={category.name}
+                    count={category.count}
+                    onNavigate={closeMenu}
+                  />
+                ))
               )}
             </NavigationSection>
 
@@ -174,9 +124,7 @@ export function CatalogNavigation({
                     href={`/productos?area=${area.slug}`}
                     name={area.name}
                     count={area.count}
-                    onNavigate={
-                      closeMenu
-                    }
+                    onNavigate={closeMenu}
                   />
                 ))
               )}
@@ -212,14 +160,10 @@ function NavigationSection({
       <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
         <Icon className="h-4 w-4 text-sky-700" />
 
-        <h2 className="text-sm font-semibold text-slate-950">
-          {title}
-        </h2>
+        <h2 className="text-sm font-semibold text-slate-950">{title}</h2>
       </div>
 
-      <div className="mt-3 max-h-72 space-y-1 overflow-y-auto">
-        {children}
-      </div>
+      <div className="mt-3 max-h-72 space-y-1 overflow-y-auto">{children}</div>
 
       <Link
         href={allHref}
@@ -251,13 +195,9 @@ function NavigationLink({
       onClick={onNavigate}
       className="flex items-center justify-between gap-4 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-sky-50 hover:text-sky-700"
     >
-      <span className="font-medium">
-        {name}
-      </span>
+      <span className="font-medium">{name}</span>
 
-      <span className="text-xs text-slate-400">
-        {count}
-      </span>
+      <span className="text-xs text-slate-400">{count}</span>
     </Link>
   );
 }

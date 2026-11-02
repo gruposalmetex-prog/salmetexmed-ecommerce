@@ -1,9 +1,6 @@
-import type {
-  NextConfig,
-} from "next";
+import type { NextConfig } from "next";
 
-const cloudinaryCloudName =
-  process.env.CLOUDINARY_CLOUD_NAME;
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME;
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -13,16 +10,15 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    remotePatterns:
-      cloudinaryCloudName
-        ? [
-            new URL(
-              `https://res.cloudinary.com/${encodeURIComponent(
-                cloudinaryCloudName,
-              )}/image/upload/**`,
-            ),
-          ]
-        : [],
+    remotePatterns: cloudinaryCloudName
+      ? [
+          new URL(
+            `https://res.cloudinary.com/${encodeURIComponent(
+              cloudinaryCloudName,
+            )}/image/upload/**`,
+          ),
+        ]
+      : [],
   },
 };
 

@@ -63,7 +63,7 @@ export default async function CategoriesPage() {
             {categories.map((category) => (
               <li key={category.slug}>
                 <Link
-                  href={`/productos?category=${category.slug}`}
+                  href={`/categorias/${category.slug}`}
                   aria-label={`Ver productos de ${category.name}`}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/60"
                 >

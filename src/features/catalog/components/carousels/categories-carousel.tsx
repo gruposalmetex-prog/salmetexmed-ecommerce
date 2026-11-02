@@ -71,7 +71,7 @@ export function CategoriesCarousel({ categories }: CategoriesCarouselProps) {
                 className="pl-4 sm:basis-1/2 lg:basis-1/3 xl:basis-1/5"
               >
                 <Link
-                  href={`/productos?category=${category.slug}`}
+                  href={`/categorias/${category.slug}`}
                   aria-label={`Ver productos de ${category.name}`}
                   className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/60"
                 >

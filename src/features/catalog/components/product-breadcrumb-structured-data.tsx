@@ -7,15 +7,14 @@ interface ProductBreadcrumbStructuredDataProps {
 }
 
 function serializeJsonLd(data: unknown) {
-  return JSON.stringify(data).replace(
-    /</g,
-    "\\u003c",
-  );
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
 export function ProductBreadcrumbStructuredData({
   product,
 }: ProductBreadcrumbStructuredDataProps) {
+  const category = product.categories[0] ?? null;
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -33,15 +32,23 @@ export function ProductBreadcrumbStructuredData({
         name: "Productos",
         item: getAbsoluteUrl("/productos"),
       },
+      ...(category
+        ? [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: category.name,
+              item: getAbsoluteUrl(`/categorias/${category.slug}`),
+            },
+          ]
+        : []),
       {
         "@type": "ListItem",
-        position: 3,
+        position: category ? 4 : 3,
         name: product.name,
         item:
           product.seo.canonicalUrl ??
-          getAbsoluteUrl(
-            `/productos/${product.slug}`,
-          ),
+          getAbsoluteUrl(`/productos/${product.slug}`),
       },
     ],
   };
@@ -50,8 +57,7 @@ export function ProductBreadcrumbStructuredData({
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html:
-          serializeJsonLd(structuredData),
+        __html: serializeJsonLd(structuredData),
       }}
     />
   );

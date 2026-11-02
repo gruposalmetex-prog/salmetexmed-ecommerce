@@ -13,6 +13,7 @@ import {
   getPublicProducts,
   isProductSort,
 } from "@/features/catalog/services/product.service";
+import { CatalogPageLayout } from "@/features/catalog/components/catalog-page-layout";
 
 const DEFAULT_CATALOG_DESCRIPTION =
   "Compra y cotiza equipo médico, mobiliario hospitalario e insumos para hospitales, clínicas y consultorios en México. Recibe asesoría especializada.";
@@ -78,7 +79,7 @@ export async function generateMetadata({
       description,
 
       alternates: {
-        canonical: `/productos?category=${encodeURIComponent(category.slug)}`,
+        canonical: `/categorias/${encodeURIComponent(category.slug)}`,
       },
 
       robots: {
@@ -221,75 +222,35 @@ export default async function ProductsPage({
   }
 
   return (
-    <div className="w-full bg-white">
-      <div className="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 text-sm text-slate-500">
-          <Link href="/" className="transition hover:text-sky-700">
-            Inicio
-          </Link>
-
-          <span className="mx-2">/</span>
-
-          <Link href="/productos" className="transition hover:text-sky-700">
-            Productos
-          </Link>
-
-          {selectedCatalogGroup && (
-            <>
-              <span className="mx-2">/</span>
-
-              <span className="font-medium text-slate-700">
-                {selectedCatalogGroup.name}
-              </span>
-            </>
-          )}
-        </div>
-
-        <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <CatalogSidebar
-            filters={filterOptions}
-            selectedFilters={{
-              area: selectedFilters.areas,
-
-              category: selectedFilters.categories,
-
-              brand: selectedFilters.brands,
-
-              inStock: selectedFilters.inStock,
-
-              minPrice: selectedFilters.minPrice,
-
-              maxPrice: selectedFilters.maxPrice,
-            }}
-          />
-
-          <div className="min-w-0">
-            <div className="mb-6">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-                {pageTitle}
-              </h1>
-
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                {pageDescription}
-              </p>
-
-              {search && (
-                <Link
-                  href="/productos"
-                  className="mt-3 inline-flex text-sm font-semibold text-sky-700 transition hover:text-sky-800"
-                >
-                  Limpiar búsqueda
-                </Link>
-              )}
-            </div>
-
-            <CatalogToolbar productCount={products.length} sort={sort} />
-
-            <ProductGrid products={products} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <CatalogPageLayout
+      title={pageTitle}
+      description={pageDescription}
+      breadcrumbs={[
+        { label: "Inicio", href: "/" },
+        { label: "Productos", href: "/productos" },
+        ...(selectedCatalogGroup ? [{ label: selectedCatalogGroup.name }] : []),
+      ]}
+      filters={filterOptions}
+      selectedFilters={{
+        area: selectedFilters.areas,
+        category: selectedFilters.categories,
+        brand: selectedFilters.brands,
+        inStock: selectedFilters.inStock,
+        minPrice: selectedFilters.minPrice,
+        maxPrice: selectedFilters.maxPrice,
+      }}
+      products={products}
+      sort={sort}
+    >
+      {search && (
+        <Link
+          href="/productos"
+          className="mt-3 inline-flex text-sm font-semibold text-sky-700 transition hover:text-sky-800"
+        >
+          Limpiar búsqueda
+        </Link>
+      )}
+    </CatalogPageLayout>
   );
 }
 

@@ -1,11 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Mail,
-  MapPin,
-  Phone,
-  ArrowRight,
-} from "lucide-react";
+import { Mail, MapPin, Phone, ArrowRight } from "lucide-react";
 
 const catalogLinks = [
   { label: "Productos", href: "/productos" },
@@ -73,18 +68,18 @@ export function Footer() {
               aria-label="Ir al inicio"
             >
               <Image
-  src="/image.webp"
-  alt="Logo SALMETEXMED"
-  width={256}
-  height={232}
-  sizes="76px"
-  className="h-17 w-auto object-contain"
-/>
+                src="/image.webp"
+                alt="Logo SALMETEXMED"
+                width={256}
+                height={232}
+                sizes="76px"
+                className="h-17 w-auto object-contain"
+              />
             </Link>
 
             <p className="mt-5 max-w-sm text-sm leading-6 text-slate-400">
-              Equipo médico y soluciones para hospitales, clínicas,
-              consultorios y profesionales de la salud.
+              Equipo médico y soluciones para hospitales, clínicas, consultorios
+              y profesionales de la salud.
             </p>
 
             <div className="mt-6 space-y-4">
@@ -93,7 +88,7 @@ export function Footer() {
                 className="flex items-start gap-3 text-sm text-slate-400 transition hover:text-white"
               >
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
-                <span>+52 55 0000 0000</span>
+                <span>+52 1 844 595 4660</span>
               </a>
 
               <a
@@ -107,18 +102,14 @@ export function Footer() {
               <div className="flex items-start gap-3 text-sm text-slate-400">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
 
-                <span>
-                  Estado de México, México
-                </span>
+                <span>Estado de México, México</span>
               </div>
             </div>
           </div>
 
           {/* Catálogo */}
           <div>
-            <h3 className="text-sm font-semibold text-white">
-              Catálogo
-            </h3>
+            <h3 className="text-sm font-semibold text-white">Catálogo</h3>
 
             <ul className="mt-5 space-y-3">
               {catalogLinks.map((item) => (
@@ -136,9 +127,7 @@ export function Footer() {
 
           {/* Empresa */}
           <div>
-            <h3 className="text-sm font-semibold text-white">
-              Empresa
-            </h3>
+            <h3 className="text-sm font-semibold text-white">Empresa</h3>
 
             <ul className="mt-5 space-y-3">
               {companyLinks.map((item) => (
@@ -156,9 +145,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-sm font-semibold text-white">
-              Información
-            </h3>
+            <h3 className="text-sm font-semibold text-white">Información</h3>
 
             <ul className="mt-5 space-y-3">
               {legalLinks.map((item) => (
@@ -179,13 +166,9 @@ export function Footer() {
       {/* Footer inferior */}
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-5 text-xs text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-          <p>
-            © {currentYear} SALMETEXMED. Todos los derechos reservados.
-          </p>
+          <p>© {currentYear} SALMETEXMED. Todos los derechos reservados.</p>
 
-          <p>
-            Equipo médico y soluciones para el sector salud en México.
-          </p>
+          <p>Equipo médico y soluciones para el sector salud en México.</p>
         </div>
       </div>
     </footer>

@@ -25,20 +25,14 @@ import {
   productVariants,
 } from "@/db/schema";
 
-function containsText(
-  column: SQLWrapper,
-  pattern: string,
-): SQL {
+function containsText(column: SQLWrapper, pattern: string): SQL {
   return sql`
     unaccent(lower(${column}))
     LIKE unaccent(lower(${pattern}))
   `;
 }
 
-function queryProductBySlug(
-  slug: string,
-  publishedOnly: boolean,
-) {
+function queryProductBySlug(slug: string, publishedOnly: boolean) {
   const db = getDatabase();
 
   return db.query.products.findFirst({
@@ -49,10 +43,7 @@ function queryProductBySlug(
         return slugCondition;
       }
 
-      return and(
-        slugCondition,
-        eq(products.status, "published"),
-      );
+      return and(slugCondition, eq(products.status, "published"));
     },
 
     with: {
@@ -73,9 +64,7 @@ function queryProductBySlug(
       },
 
       variants: {
-        orderBy: (variants, { asc }) => [
-          asc(variants.sortOrder),
-        ],
+        orderBy: (variants, { asc }) => [asc(variants.sortOrder)],
       },
 
       images: {
@@ -88,14 +77,9 @@ function queryProductBySlug(
       documents: true,
     },
   });
-
-
 }
 
-export type ProductSaleMode =
-  | "direct_purchase"
-  | "quote_only"
-  | "contact_only";
+export type ProductSaleMode = "direct_purchase" | "quote_only" | "contact_only";
 
 export interface ProductListFilters {
   ids?: string[];
@@ -111,58 +95,35 @@ export interface ProductListFilters {
   maxPriceInCents?: number;
 }
 
-export async function listPublishedProducts(filters: ProductListFilters = {}, limit?: number) {
+export async function listPublishedProducts(
+  filters: ProductListFilters = {},
+  limit?: number,
+) {
   const db = getDatabase();
 
-  const conditions: SQL[] = [
-    eq(productsTable.status, "published"),
-  ];
+  const conditions: SQL[] = [eq(productsTable.status, "published")];
 
   if (filters.ids?.length) {
-    conditions.push(
-      inArray(
-        productsTable.id,
-        filters.ids,
-      ),
-    );
+    conditions.push(inArray(productsTable.id, filters.ids));
   }
 
   if (filters.featured !== undefined) {
-    conditions.push(
-      eq(
-        productsTable.featured,
-        filters.featured,
-      ),
-    );
+    conditions.push(eq(productsTable.featured, filters.featured));
   }
 
-  const searchTerm =
-    filters.search?.trim();
+  const searchTerm = filters.search?.trim();
 
   if (searchTerm) {
-    const searchPattern =
-      `%${searchTerm}%`;
+    const searchPattern = `%${searchTerm}%`;
 
     const searchCondition = or(
-      containsText(
-        productsTable.name,
-        searchPattern,
-      ),
+      containsText(productsTable.name, searchPattern),
 
-      containsText(
-        productsTable.slug,
-        searchPattern,
-      ),
+      containsText(productsTable.slug, searchPattern),
 
-      containsText(
-        productsTable.shortDescription,
-        searchPattern,
-      ),
+      containsText(productsTable.shortDescription, searchPattern),
 
-      containsText(
-        productsTable.description,
-        searchPattern,
-      ),
+      containsText(productsTable.description, searchPattern),
 
       exists(
         db
@@ -172,20 +133,11 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(brands)
           .where(
             and(
-              eq(
-                brands.id,
-                productsTable.brandId,
-              ),
+              eq(brands.id, productsTable.brandId),
               eq(brands.active, true),
               or(
-                containsText(
-                  brands.name,
-                  searchPattern,
-                ),
-                containsText(
-                  brands.slug,
-                  searchPattern,
-                ),
+                containsText(brands.name, searchPattern),
+                containsText(brands.slug, searchPattern),
               ),
             ),
           ),
@@ -199,30 +151,15 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productCategories)
           .innerJoin(
             categories,
-            eq(
-              categories.id,
-              productCategories.categoryId,
-            ),
+            eq(categories.id, productCategories.categoryId),
           )
           .where(
             and(
-              eq(
-                productCategories.productId,
-                productsTable.id,
-              ),
-              eq(
-                categories.active,
-                true,
-              ),
+              eq(productCategories.productId, productsTable.id),
+              eq(categories.active, true),
               or(
-                containsText(
-                  categories.name,
-                  searchPattern,
-                ),
-                containsText(
-                  categories.slug,
-                  searchPattern,
-                ),
+                containsText(categories.name, searchPattern),
+                containsText(categories.slug, searchPattern),
               ),
             ),
           ),
@@ -236,27 +173,12 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productVariants)
           .where(
             and(
-              eq(
-                productVariants.productId,
-                productsTable.id,
-              ),
-              eq(
-                productVariants.active,
-                true,
-              ),
+              eq(productVariants.productId, productsTable.id),
+              eq(productVariants.active, true),
               or(
-                containsText(
-                  productVariants.name,
-                  searchPattern,
-                ),
-                containsText(
-                  productVariants.sku,
-                  searchPattern,
-                ),
-                containsText(
-                  productVariants.model,
-                  searchPattern,
-                ),
+                containsText(productVariants.name, searchPattern),
+                containsText(productVariants.sku, searchPattern),
+                containsText(productVariants.model, searchPattern),
               ),
             ),
           ),
@@ -264,27 +186,17 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
     );
 
     if (searchCondition) {
-      conditions.push(
-        searchCondition,
-      );
+      conditions.push(searchCondition);
     }
   }
 
   if (filters.saleModes?.length) {
-    conditions.push(
-      inArray(
-        productsTable.saleMode,
-        filters.saleModes,
-      ),
-    );
+    conditions.push(inArray(productsTable.saleMode, filters.saleModes));
   }
 
   if (filters.promotion) {
     conditions.push(
-      eq(
-        productsTable.saleMode,
-        "direct_purchase",
-      ),
+      eq(productsTable.saleMode, "direct_purchase"),
 
       exists(
         db
@@ -294,41 +206,19 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productVariants)
           .where(
             and(
-              eq(
-                productVariants.productId,
-                productsTable.id,
-              ),
-              eq(
-                productVariants.active,
-                true,
-              ),
-              eq(
-                productVariants.purchaseEnabled,
-                true,
-              ),
-              isNotNull(
-                productVariants.priceInCents,
-              ),
-              isNotNull(
-                productVariants.compareAtPriceInCents,
-              ),
+              eq(productVariants.productId, productsTable.id),
+              eq(productVariants.active, true),
+              eq(productVariants.purchaseEnabled, true),
+              isNotNull(productVariants.priceInCents),
+              isNotNull(productVariants.compareAtPriceInCents),
               gt(
                 productVariants.compareAtPriceInCents,
                 productVariants.priceInCents,
               ),
               or(
-                eq(
-                  productVariants.trackInventory,
-                  false,
-                ),
-                gt(
-                  productVariants.stock,
-                  0,
-                ),
-                eq(
-                  productVariants.allowBackorder,
-                  true,
-                ),
+                eq(productVariants.trackInventory, false),
+                gt(productVariants.stock, 0),
+                eq(productVariants.allowBackorder, true),
               ),
             ),
           ),
@@ -346,10 +236,7 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           })
           .from(brands)
           .where(
-            and(
-              eq(brands.active, true),
-              inArray(brands.slug, filters.brands),
-            ),
+            and(eq(brands.active, true), inArray(brands.slug, filters.brands)),
           ),
       ),
     );
@@ -365,22 +252,13 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productCategories)
           .innerJoin(
             categories,
-            eq(
-              categories.id,
-              productCategories.categoryId,
-            ),
+            eq(categories.id, productCategories.categoryId),
           )
           .where(
             and(
-              eq(
-                productCategories.productId,
-                productsTable.id,
-              ),
+              eq(productCategories.productId, productsTable.id),
               eq(categories.active, true),
-              inArray(
-                categories.slug,
-                filters.categories,
-              ),
+              inArray(categories.slug, filters.categories),
             ),
           ),
       ),
@@ -397,28 +275,16 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productCategories)
           .innerJoin(
             categories,
-            eq(
-              categories.id,
-              productCategories.categoryId,
-            ),
+            eq(categories.id, productCategories.categoryId),
           )
           .innerJoin(
             areaCategories,
-            eq(
-              areaCategories.categoryId,
-              categories.id,
-            ),
+            eq(areaCategories.categoryId, categories.id),
           )
-          .innerJoin(
-            areas,
-            eq(areas.id, areaCategories.areaId),
-          )
+          .innerJoin(areas, eq(areas.id, areaCategories.areaId))
           .where(
             and(
-              eq(
-                productCategories.productId,
-                productsTable.id,
-              ),
+              eq(productCategories.productId, productsTable.id),
               eq(categories.active, true),
               eq(areas.active, true),
               inArray(areas.slug, filters.areas),
@@ -438,16 +304,10 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
           .from(productVariants)
           .where(
             and(
-              eq(
-                productVariants.productId,
-                productsTable.id,
-              ),
+              eq(productVariants.productId, productsTable.id),
               eq(productVariants.active, true),
               or(
-                eq(
-                  productVariants.trackInventory,
-                  false,
-                ),
+                eq(productVariants.trackInventory, false),
                 gt(productVariants.stock, 0),
               ),
             ),
@@ -462,10 +322,7 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
 
   if (hasPriceFilter) {
     const priceConditions: SQL[] = [
-      eq(
-        productVariants.productId,
-        productsTable.id,
-      ),
+      eq(productVariants.productId, productsTable.id),
       eq(productVariants.active, true),
       eq(productVariants.purchaseEnabled, true),
       isNotNull(productVariants.priceInCents),
@@ -478,27 +335,18 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
 
     if (filters.minPriceInCents !== undefined) {
       priceConditions.push(
-        gte(
-          productVariants.priceInCents,
-          filters.minPriceInCents,
-        ),
+        gte(productVariants.priceInCents, filters.minPriceInCents),
       );
     }
 
     if (filters.maxPriceInCents !== undefined) {
       priceConditions.push(
-        lte(
-          productVariants.priceInCents,
-          filters.maxPriceInCents,
-        ),
+        lte(productVariants.priceInCents, filters.maxPriceInCents),
       );
     }
 
     conditions.push(
-      eq(
-        productsTable.saleMode,
-        "direct_purchase",
-      ),
+      eq(productsTable.saleMode, "direct_purchase"),
 
       exists(
         db
@@ -514,9 +362,11 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
   return db.query.products.findMany({
     where: and(...conditions),
 
-    ...(limit !== undefined ? {
-      limit,
-    } : {}),
+    ...(limit !== undefined
+      ? {
+          limit,
+        }
+      : {}),
 
     columns: {
       id: true,
@@ -526,6 +376,7 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
       saleMode: true,
       featured: true,
       publishedAt: true,
+      updatedAt: true,
     },
 
     with: {
@@ -538,8 +389,7 @@ export async function listPublishedProducts(filters: ProductListFilters = {}, li
       },
 
       variants: {
-        where: (variants, { eq }) =>
-          eq(variants.active, true),
+        where: (variants, { eq }) => eq(variants.active, true),
 
         columns: {
           id: true,

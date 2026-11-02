@@ -49,7 +49,7 @@ export function ProductDetail({
               <ChevronRight className="h-4 w-4 text-slate-300" />
 
               <Link
-                href={`/productos?category=${product.categories[0].slug}`}
+                href={`/categorias/${product.categories[0].slug}`}
                 className="transition hover:text-sky-700"
               >
                 {product.categories[0].name}
@@ -158,7 +158,7 @@ export function ProductDetail({
                     {product.categories.map((category) => (
                       <Link
                         key={category.slug}
-                        href={`/productos?category=${category.slug}`}
+                        href={`/categorias/${category.slug}`}
                         className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-sky-200 hover:text-sky-700"
                       >
                         {category.name}

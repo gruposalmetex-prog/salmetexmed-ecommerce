@@ -19,11 +19,13 @@ interface SelectedCatalogFilters {
 interface CatalogSidebarProps {
   filters: PublicCatalogFilters;
   selectedFilters: SelectedCatalogFilters;
+  basePath?: string;
 }
 
 export function CatalogSidebar({
   filters,
   selectedFilters,
+  basePath,
 }: CatalogSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -73,6 +75,13 @@ export function CatalogSidebar({
     });
   }
 
+  function navigate(parameters: URLSearchParams) {
+    const target = basePath ?? pathname;
+    const query = parameters.toString();
+
+    router.push(query ? `${target}?${query}` : target);
+  }
+
   function updateFilter(
     name: CatalogFilterName,
     value: string,
@@ -96,9 +105,7 @@ export function CatalogSidebar({
 
     parameters.delete("page");
 
-    const query = parameters.toString();
-
-    router.push(query ? `${pathname}?${query}` : pathname);
+    navigate(parameters);
   }
 
   function updateAvailability(checked: boolean) {
@@ -112,9 +119,7 @@ export function CatalogSidebar({
 
     parameters.delete("page");
 
-    const query = parameters.toString();
-
-    router.push(query ? `${pathname}?${query}` : pathname);
+    navigate(parameters);
   }
 
   function clearFilters() {
@@ -138,9 +143,7 @@ export function CatalogSidebar({
       maxPrice: "",
     });
 
-    const query = parameters.toString();
-
-    router.push(query ? `${pathname}?${query}` : pathname);
+    navigate(parameters);
   }
 
   function applyPriceFilter() {
@@ -160,9 +163,7 @@ export function CatalogSidebar({
 
     parameters.delete("page");
 
-    const query = parameters.toString();
-
-    router.push(query ? `${pathname}?${query}` : pathname);
+    navigate(parameters);
   }
 
   return (
